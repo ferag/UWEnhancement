@@ -126,14 +126,14 @@ class UIEC2Net(BaseNet):
         S_out2 = piece_function_org(H_in, H2S, self.M)
         S_out = (S_out1 + S_out2) / 2
 
-        zero_lab = torch.zeros(S_out.shape).cuda()
+        zero_lab = torch.zeros_like(S_out)
         s_t = torch.where(S_out < 0, zero_lab, S_out)
-        one_lab = torch.ones(S_out.shape).cuda()
+        one_lab = torch.ones_like(S_out)
         S_out = torch.where(s_t > 1, one_lab, s_t)
 
-        zero_lab = torch.zeros(V_out.shape).cuda()
+        zero_lab = torch.zeros_like(V_out)
         s_t = torch.where(V_out < 0, zero_lab, V_out)
-        one_lab = torch.ones(V_out.shape).cuda()
+        one_lab = torch.ones_like(V_out)
         V_out = torch.where(s_t > 1, one_lab, s_t)
 
         hsv_out = torch.cat([H_out, S_out, V_out], dim=1)
@@ -173,14 +173,14 @@ def piece_function_org(x_m, para_m, M):
     for i in range(M-1):
         para = (para_m[:, i + 1] - para_m[:, i]).view(b, c, 1, 1).expand(b, c, w, h)
         r_m = r_m + para * \
-              sgn_m(M * x_m - i * torch.ones(x_m.shape).cuda())
+              sgn_m(M * x_m - i * torch.ones_like(x_m))
     return r_m
 
 def sgn_m(x):
     # x = torch.Tensor(x)
-    zero_lab = torch.zeros(x.shape).cuda()
+    zero_lab = torch.zeros_like(x)
     # print("one_lab",one_lab)
     s_t = torch.where(x < 0, zero_lab, x)
-    one_lab = torch.ones(x.shape).cuda()
+    one_lab = torch.ones_like(x)
     s = torch.where(s_t > 1, one_lab, s_t)
     return s
