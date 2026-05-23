@@ -8,13 +8,23 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
+REPO_ROOT = Path(__file__).resolve().parent
+REPO_ROOT_STR = str(REPO_ROOT)
+
+# This repository includes a local ``importlib/`` directory that can shadow
+# Python's standard library when the script is executed from the repo root.
+# Temporarily drop the repo path before importing third-party packages.
+trimmed_sys_path = [
+    entry for entry in sys.path
+    if entry not in ("", REPO_ROOT_STR)
+]
+sys.path[:] = trimmed_sys_path
+
 import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 
-
-REPO_ROOT = Path(__file__).resolve().parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
+if REPO_ROOT_STR not in sys.path:
+    sys.path.insert(0, REPO_ROOT_STR)
 
 
 def parse_args() -> argparse.Namespace:
